@@ -49,8 +49,8 @@ cmake_ninja_workdir = /home/nero/DevProject/gtk3_parctice/SortTest/build/
 
 build cmake_object_order_depends_target_SortTest: phony || cmake_object_order_depends_target_SortDisplay
 
-build CMakeFiles/SortTest.dir/sortUI.c.o: C_COMPILER__SortTest_unscanned_Debug /home/nero/DevProject/gtk3_parctice/SortTest/sortUI.c || cmake_object_order_depends_target_SortTest
-  DEP_FILE = CMakeFiles/SortTest.dir/sortUI.c.o.d
+build CMakeFiles/SortTest.dir/sortUI.cpp.o: CXX_COMPILER__SortTest_unscanned_Debug /home/nero/DevProject/gtk3_parctice/SortTest/sortUI.cpp || cmake_object_order_depends_target_SortTest
+  DEP_FILE = CMakeFiles/SortTest.dir/sortUI.cpp.o.d
   FLAGS = -g
   INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/webp -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
   OBJECT_DIR = CMakeFiles/SortTest.dir
@@ -64,7 +64,7 @@ build CMakeFiles/SortTest.dir/sortUI.c.o: C_COMPILER__SortTest_unscanned_Debug /
 #############################################
 # Link the executable SortTest
 
-build SortTest: C_EXECUTABLE_LINKER__SortTest_Debug CMakeFiles/SortTest.dir/sortUI.c.o | libSortDisplay.a || libSortDisplay.a
+build SortTest: CXX_EXECUTABLE_LINKER__SortTest_Debug CMakeFiles/SortTest.dir/sortUI.cpp.o | libSortDisplay.a || libSortDisplay.a
   FLAGS = -g
   LINK_LIBRARIES = libSortDisplay.a  -lgtk-3  -lgdk-3  -lz  -lpangocairo-1.0  -lpango-1.0  -lharfbuzz  -latk-1.0  -lcairo-gobject  -lcairo  -lgdk_pixbuf-2.0  -lgio-2.0  -lgobject-2.0  -lglib-2.0  -lm
   OBJECT_DIR = CMakeFiles/SortTest.dir

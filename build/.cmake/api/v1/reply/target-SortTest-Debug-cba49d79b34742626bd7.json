@@ -135,7 +135,7 @@
 					"path" : "/usr/lib/x86_64-linux-gnu/dbus-1.0/include"
 				}
 			],
-			"language" : "C",
+			"language" : "CXX",
 			"sourceIndexes" : 
 			[
 				0
@@ -238,7 +238,7 @@
 				"role" : "libraries"
 			}
 		],
-		"language" : "C"
+		"language" : "CXX"
 	},
 	"name" : "SortTest",
 	"nameOnDisk" : "SortTest",
@@ -262,7 +262,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "sortUI.c",
+			"path" : "sortUI.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],
