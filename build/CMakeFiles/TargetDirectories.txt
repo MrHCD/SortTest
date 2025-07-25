@@ -1,0 +1,4 @@
+/home/nero/DevProject/gtk3_parctice/SortTest/build/CMakeFiles/SortTest.dir
+/home/nero/DevProject/gtk3_parctice/SortTest/build/CMakeFiles/SortDisplay.dir
+/home/nero/DevProject/gtk3_parctice/SortTest/build/CMakeFiles/edit_cache.dir
+/home/nero/DevProject/gtk3_parctice/SortTest/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSortDisplay.a CMakeFiles/SortDisplay.dir/SortDisplay.c.o
+/usr/bin/ranlib libSortDisplay.a
