@@ -16,7 +16,9 @@
 					"targetIndexes" : 
 					[
 						0,
-						1
+						1,
+						2,
+						3
 					]
 				}
 			],
@@ -32,12 +34,21 @@
 					"targetIndexes" : 
 					[
 						0,
-						1
+						1,
+						2,
+						3
 					]
 				}
 			],
 			"targets" : 
 			[
+				{
+					"directoryIndex" : 0,
+					"id" : "SortController::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SortController-Debug-33e3e3b8de655cac76b9.json",
+					"name" : "SortController",
+					"projectIndex" : 0
+				},
 				{
 					"directoryIndex" : 0,
 					"id" : "SortDisplay::@6890427a1f51a3e7e1df",
@@ -47,8 +58,15 @@
 				},
 				{
 					"directoryIndex" : 0,
+					"id" : "SortModel::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SortModel-Debug-e2d2a0eacb5793d7d41d.json",
+					"name" : "SortModel",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
 					"id" : "SortTest::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-SortTest-Debug-cba49d79b34742626bd7.json",
+					"jsonFile" : "target-SortTest-Debug-f745cd2ba2d00fcc8580.json",
 					"name" : "SortTest",
 					"projectIndex" : 0
 				}

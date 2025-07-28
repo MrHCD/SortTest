@@ -47,7 +47,7 @@ cmake_ninja_workdir = /home/nero/DevProject/gtk3_parctice/SortTest/build/
 #############################################
 # Order-only phony target for SortTest
 
-build cmake_object_order_depends_target_SortTest: phony || cmake_object_order_depends_target_SortDisplay
+build cmake_object_order_depends_target_SortTest: phony || cmake_object_order_depends_target_SortController cmake_object_order_depends_target_SortDisplay cmake_object_order_depends_target_SortModel
 
 build CMakeFiles/SortTest.dir/sortUI.cpp.o: CXX_COMPILER__SortTest_unscanned_Debug /home/nero/DevProject/gtk3_parctice/SortTest/sortUI.cpp || cmake_object_order_depends_target_SortTest
   DEP_FILE = CMakeFiles/SortTest.dir/sortUI.cpp.o.d
@@ -64,9 +64,9 @@ build CMakeFiles/SortTest.dir/sortUI.cpp.o: CXX_COMPILER__SortTest_unscanned_Deb
 #############################################
 # Link the executable SortTest
 
-build SortTest: CXX_EXECUTABLE_LINKER__SortTest_Debug CMakeFiles/SortTest.dir/sortUI.cpp.o | libSortDisplay.a || libSortDisplay.a
+build SortTest: CXX_EXECUTABLE_LINKER__SortTest_Debug CMakeFiles/SortTest.dir/sortUI.cpp.o | libSortDisplay.a libSortModel.a libSortController.a || libSortController.a libSortDisplay.a libSortModel.a
   FLAGS = -g
-  LINK_LIBRARIES = libSortDisplay.a  -lgtk-3  -lgdk-3  -lz  -lpangocairo-1.0  -lpango-1.0  -lharfbuzz  -latk-1.0  -lcairo-gobject  -lcairo  -lgdk_pixbuf-2.0  -lgio-2.0  -lgobject-2.0  -lglib-2.0  -lm
+  LINK_LIBRARIES = libSortDisplay.a  libSortModel.a  libSortController.a  -lgtk-3  -lgdk-3  -lz  -lpangocairo-1.0  -lpango-1.0  -lharfbuzz  -latk-1.0  -lcairo-gobject  -lcairo  -lgdk_pixbuf-2.0  -lgio-2.0  -lgobject-2.0  -lglib-2.0  -lm
   OBJECT_DIR = CMakeFiles/SortTest.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -105,6 +105,70 @@ build libSortDisplay.a: C_STATIC_LIBRARY_LINKER__SortDisplay_Debug CMakeFiles/So
   TARGET_FILE = libSortDisplay.a
   TARGET_PDB = SortDisplay.a.dbg
 
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target SortModel
+
+
+#############################################
+# Order-only phony target for SortModel
+
+build cmake_object_order_depends_target_SortModel: phony || CMakeFiles/SortModel.dir
+
+build CMakeFiles/SortModel.dir/BarObject.cpp.o: CXX_COMPILER__SortModel_unscanned_Debug /home/nero/DevProject/gtk3_parctice/SortTest/BarObject.cpp || cmake_object_order_depends_target_SortModel
+  DEP_FILE = CMakeFiles/SortModel.dir/BarObject.cpp.o.d
+  FLAGS = -g
+  INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/webp -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  OBJECT_DIR = CMakeFiles/SortModel.dir
+  OBJECT_FILE_DIR = CMakeFiles/SortModel.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target SortModel
+
+
+#############################################
+# Link the static library libSortModel.a
+
+build libSortModel.a: CXX_STATIC_LIBRARY_LINKER__SortModel_Debug CMakeFiles/SortModel.dir/BarObject.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = CMakeFiles/SortModel.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = libSortModel.a
+  TARGET_PDB = SortModel.a.dbg
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target SortController
+
+
+#############################################
+# Order-only phony target for SortController
+
+build cmake_object_order_depends_target_SortController: phony || CMakeFiles/SortController.dir
+
+build CMakeFiles/SortController.dir/SortControl.cpp.o: CXX_COMPILER__SortController_unscanned_Debug /home/nero/DevProject/gtk3_parctice/SortTest/SortControl.cpp || cmake_object_order_depends_target_SortController
+  DEP_FILE = CMakeFiles/SortController.dir/SortControl.cpp.o.d
+  FLAGS = -g
+  INCLUDES = -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/webp -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
+  OBJECT_DIR = CMakeFiles/SortController.dir
+  OBJECT_FILE_DIR = CMakeFiles/SortController.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target SortController
+
+
+#############################################
+# Link the static library libSortController.a
+
+build libSortController.a: CXX_STATIC_LIBRARY_LINKER__SortController_Debug CMakeFiles/SortController.dir/SortControl.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = CMakeFiles/SortController.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = libSortController.a
+  TARGET_PDB = SortController.a.dbg
+
 
 #############################################
 # Utility command for edit_cache
@@ -131,7 +195,11 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
+build SortController: phony libSortController.a
+
 build SortDisplay: phony libSortDisplay.a
+
+build SortModel: phony libSortModel.a
 
 # =============================================================================
 # Folder targets.
@@ -141,7 +209,7 @@ build SortDisplay: phony libSortDisplay.a
 #############################################
 # Folder: /home/nero/DevProject/gtk3_parctice/SortTest/build
 
-build all: phony SortTest libSortDisplay.a
+build all: phony SortTest libSortDisplay.a libSortModel.a libSortController.a
 
 # =============================================================================
 # Built-in targets

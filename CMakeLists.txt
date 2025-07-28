@@ -14,9 +14,19 @@ add_library(SortDisplay
     SortDisplay.h
     SortDisplay.c)
 
+add_library(SortModel 
+    BarObject.h
+    BarObject.cpp)
+
+add_library(SortController 
+    SortControl.h
+    SortControl.cpp)
+
 target_include_directories(SortDisplay PUBLIC ${GTK_INCLUDE_DIRS})
 
 target_link_libraries(SortTest
     SortDisplay
+    SortModel
+    SortController
     ${GTK_LIBRARIES}
     -lm)

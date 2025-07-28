@@ -1,7 +1,11 @@
 #include <gtk/gtk.h>
 #include "SortDisplay.h"
 
+#include "SortControl.h"
+
 GtkWidget *sort_display;
+
+SortControl sort_ctrl;
 
 // Enum to represent sorting algorithms
 typedef enum
@@ -17,21 +21,22 @@ typedef enum
     RADIX_SORT
 } SortAlgorithm;
 
+
 // Global variable to store the selected sorting algorithm
 SortAlgorithm selected_algorithm = BUBBLE_SORT;
 
 // Declare or include the sorting algorithm functions
-gboolean bubble_sort(int *array, int *size);
-gboolean selection_sort(int *array, int *size);
-gboolean insertion_sort(int *array, int *size);
-gboolean quick_sort(int *array, int *size);
-gboolean merge_sort(int *array, int *size);
-gboolean heap_sort(int *array, int *size);
-gboolean shell_sort(int *array, int *size);
-gboolean counting_sort(int *array, int *size);
-gboolean radix_sort(int *array, int *size);
+gboolean bubble_sort    (BarObject *array, int size);
+gboolean selection_sort (BarObject *array, int size);
+gboolean insertion_sort (BarObject *array, int size);
+gboolean quick_sort     (BarObject *array, int size);
+gboolean merge_sort     (BarObject *array, int size);
+gboolean heap_sort      (BarObject *array, int size);
+gboolean shell_sort     (BarObject *array, int size);
+gboolean counting_sort  (BarObject *array, int size);
+gboolean radix_sort     (BarObject *array, int size);
 
-gboolean (*sort_algorithm_functions[])(int *, int *) = {
+gboolean (*sort_algorithm_functions[])(BarObject *, int ) = {
     bubble_sort,
     selection_sort,
     insertion_sort,
@@ -42,51 +47,21 @@ gboolean (*sort_algorithm_functions[])(int *, int *) = {
     counting_sort,
     radix_sort};
 
-static int exec_count = 0;
-static int bar_count = 0;
-static gboolean first_run = TRUE;
 static int delay_time = 100000; // 100 milliseconds
 
 GMutex mutex; // Mutex for thread safety
 
+
+// Function to update the surface with new content
+void my_sort_display_update_surface(gpointer user_data);
+
+
 // Callback function for radio button toggles
-void on_sort_algorithm_changed(GtkToggleButton *button, gpointer user_data)
-{
-    if (gtk_toggle_button_get_active(button))
-    {
-        const gchar *label = gtk_button_get_label(GTK_BUTTON(button));
-        if (g_strcmp0(label, "Bubble Sort") == 0)
-            selected_algorithm = BUBBLE_SORT;
-        else if (g_strcmp0(label, "Selection Sort") == 0)
-            selected_algorithm = SELECTION_SORT;
-        else if (g_strcmp0(label, "Insertion Sort") == 0)
-            selected_algorithm = INSERTION_SORT;
-        else if (g_strcmp0(label, "Quick Sort") == 0)
-            selected_algorithm = QUICK_SORT;
-        else if (g_strcmp0(label, "Merge Sort") == 0)
-            selected_algorithm = MERGE_SORT;
-        else if (g_strcmp0(label, "Heap Sort") == 0)
-            selected_algorithm = HEAP_SORT;
-        else if (g_strcmp0(label, "Shell Sort") == 0)
-            selected_algorithm = SHELL_SORT;
-        else if (g_strcmp0(label, "Counting Sort") == 0)
-            selected_algorithm = COUNTING_SORT;
-        else if (g_strcmp0(label, "Radix Sort") == 0)
-            selected_algorithm = RADIX_SORT;
-    }
-}
+void on_sort_algorithm_changed(GtkToggleButton *button, gpointer user_data);
 
 // Timeout callback to update the bar chart periodically
 gboolean update_bar_chart(gpointer user_data)
 {
-#ifdef TEST
-    MySortDisplay *sort_display = MY_SORT_DISPLAY(user_data);
-    if (sort_display)
-    {
-        shift_bar_chart_data(sort_display->data, sort_display->num_bars);
-        g_main_context_invoke(NULL, (GSourceFunc)my_sort_display_update_surface, sort_display);
-    }
-#endif
     MySortDisplay *sortDisplay = MY_SORT_DISPLAY(user_data);
     g_mutex_lock(&mutex);
     g_main_context_invoke(NULL, (GSourceFunc)my_sort_display_update_surface, sort_display);
@@ -97,7 +72,7 @@ gboolean update_bar_chart(gpointer user_data)
 gpointer update_bar_data(gpointer user_data)
 {
     MySortDisplay *sortDisplay = MY_SORT_DISPLAY(user_data);
-    sort_algorithm_functions[selected_algorithm](sortDisplay->data, &bar_count);
+    sort_algorithm_functions[selected_algorithm](sort_ctrl.getBarObjects(),sort_ctrl.getBarCount());
     return NULL; // Stop the timeout
 }
 
@@ -118,30 +93,42 @@ void generate_data(GtkButton *button, GtkEntry *entry)
 
 void on_submit_clicked(GtkButton *button, GtkEntry *entry)
 {
+    //清除原先数组，为生成新的数组做准备
+    sort_ctrl.cleanupBars();
+
     const gchar *text = gtk_entry_get_text(entry);
     if (text && *text)
     {
-        exec_count = 0; // 重置执行计数
-        bar_count = 0;
-        static int new_data[100];
+        int bar_count = 0;
+        static unsigned new_data[100];
         char *token = strtok((char *)text, ",");
+        // 检查是否存在不合法的字符
         while (token && bar_count < 100)
         {
+            // 检查是否为数字
+            if (strspn(token, "0123456789") != strlen(token))
+            {
+                gtk_entry_set_text(entry, "Invalid input. Please enter numbers like (\"1,2,3..\").");
+                return;
+            }
             new_data[bar_count++] = atoi(token);
             token = strtok(NULL, ",");
         }
 
         if (bar_count > 0)
         {
-            my_sort_display_set_data(MY_SORT_DISPLAY(sort_display), new_data, bar_count);
+            sort_ctrl.init(bar_count,new_data);
         }
+
     }
+
+    //清除记录文本框
+    gtk_entry_set_text(entry, "");
 }
 
 gboolean update_recoder(GtkTextView *recodText)
 {
-    static int last_value = 0;
-    if (exec_count == last_value)
+    if (sort_ctrl.getExecCount() == 0)
     {
         return TRUE; // No update needed
     }
@@ -151,7 +138,7 @@ gboolean update_recoder(GtkTextView *recodText)
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(recodText));
     char message[50];
 
-    snprintf(message, sizeof(message), "Record update step %d\n", exec_count);
+    snprintf(message, sizeof(message), "Record update step %d\n", sort_ctrl.getExecCount());
     gtk_text_buffer_set_text(buffer, message, -1);
 
     return TRUE;
@@ -168,15 +155,17 @@ void start_sorting(GtkButton *button, GtkTextView *recodText)
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(recodText));
     gtk_text_buffer_set_text(buffer, "Updating record...\n", -1);
 
-    if (first_run)
+    if (sort_ctrl.getIsSorted())
     {
-        first_run = FALSE;
+        sort_ctrl.setIsSorted(false);
         g_thread_new("", (GThreadFunc)update_bar_data, sort_display);
     }
 }
 
 int main(void)
 {
+
+/*UI logic ----------------------------------------------------------------------*/
     gtk_init(NULL, NULL);
 
     g_print("gtk version: %d.%d\n", gtk_get_major_version(), gtk_get_minor_version());
@@ -290,6 +279,7 @@ int main(void)
     gtk_container_add(GTK_CONTAINER(startFrame), startBox);
 
     g_signal_connect(startButton, "clicked", G_CALLBACK(start_sorting), recodText);
+/*UI logic ----------------------------------------------------------------------*/
 
     g_timeout_add(100, (GSourceFunc)update_recoder, recodText);
     g_timeout_add(10, (GSourceFunc)update_bar_chart, sort_display);
@@ -304,38 +294,44 @@ int main(void)
     return 0;
 }
 
-gboolean bubble_sort(int *array, int *size)
+gboolean bubble_sort(BarObject *array, int size)
 {
-    if (*size < 1)
+    if(size <= 1)
     {
-        first_run = TRUE;
-        exec_count = 0; // 重置执行计数
-        return FALSE;   // 如果数组大小小于1，直接返回
+        sort_ctrl.updateBars(0, BarObject::Status::SORTED); // 标记第一个元素为 SORTED
+        // 如果数组大小小于等于1，直接返回
+        sort_ctrl.resetState(); // 重置 state
+        return TRUE; // 返回TRUE表示排序成功
     }
-    // 遍历当前子数组 [0...n-2]
-    // 注意这里是 n-1，因为我们要比较 arr[i] 和 arr[i+1]，所以 i 最大只能是 n-2
-    for (int i = 0; i < *size - 1; ++i)
+
+    for(int i = 0; i < size - 1; ++i)
     {
+        sort_ctrl.updateBars(i, BarObject::Status::HIGHLIGHTED); // 更新状态为 HIGHLIGHTED
+        sort_ctrl.updateBars(i + 1, BarObject::Status::HIGHLIGHTED); // 更新下一个元素的状态为 HIGHLIGHTED
+        g_usleep(delay_time); // 延时以便观察排序过程
+
         if (array[i] > array[i + 1])
         {
             // 如果前一个元素比后一个元素大，则交换它们
-            int temp = array[i];
-            array[i] = array[i + 1];
-            array[i + 1] = temp;
+            BarObject::SwitchBars(array[i], array[i + 1]);
             g_usleep(delay_time); // 延时以便观察排序过程
-            exec_count++;
+            sort_ctrl.addExecCount(); // 增加执行计数
         }
+
+        sort_ctrl.updateBars(i, BarObject::Status::NORMAL); // 更新状态为 NORMAL
+        sort_ctrl.updateBars(i + 1, BarObject::Status::NORMAL); // 更新
     }
 
-    *size -= 1; // 每次冒泡后，最大的元素已经在正确位置，所以可以减少数组大小
+    sort_ctrl.updateBars(size - 1, BarObject::Status::SORTED); // 最后一个元素标记为 SORTED
 
-    bubble_sort(array, size); // 递归调用，继续冒泡排序
+    bubble_sort(array, size - 1); // 递归调用，继续冒泡排序
 
     return TRUE;
 }
 
-gboolean selection_sort(int *array, int *size)
+gboolean selection_sort(BarObject *array, int size)
 {
+#if 0
     static int start_index = 0;
 
     if (start_index >= *size - 1)
@@ -362,10 +358,15 @@ gboolean selection_sort(int *array, int *size)
     start_index++; // 增加起始索引，准备下一轮选择排序
 
     selection_sort(array, size); // 递归调用，继续选择排序
+#endif
+
+    return TRUE; // 返回TRUE表示排序成功
 }
 
-gboolean insertion_sort(int *array, int *size)
+gboolean insertion_sort(BarObject *array, int size)
 {
+
+#if 0
     static int current_index = 1;
     if (current_index >= *size)
     {
@@ -401,10 +402,14 @@ gboolean insertion_sort(int *array, int *size)
     current_index++; // 增加当前索引，准备下一轮插入排序
 
     insertion_sort(array, size); // 递归调用，继续插入排序
+#endif
+
+    return TRUE; // 返回TRUE表示排序成功
 }
 
-gboolean quick_sort(int *array, int *size)
+gboolean quick_sort(BarObject *array, int size)
 {
+#if 0
     int pivot_pos = 0, left_pos = 0, right_pos = *size - 1;
     if (*size < 2)
     {
@@ -452,10 +457,14 @@ gboolean quick_sort(int *array, int *size)
     int right_size = *size - left_pos - 1;         // 右边子数组的大小
     quick_sort(array, &left_size);                 // 对左边子数组进行快速排序
     quick_sort(array + left_pos + 1, &right_size); // 对右边子数组进行快速排序
+#endif
+
+    return TRUE; // 返回TRUE表示排序成功
 }
 
-void sub_merge(int *array, int size)
+void sub_merge(BarObject *array, int size)
 {
+#if 0
     if (size < 2)
     {
         first_run = TRUE;
@@ -470,7 +479,7 @@ void sub_merge(int *array, int size)
     sub_merge(array + mid, size - mid); // 对右半部分进行归并排序
 
     // 合并两个已排序的子数组
-    int *temp = g_malloc(size * sizeof(int)); // 临时数组用于存储合并结果
+    int *temp = reinterpret_cast<int*>(g_malloc(size * sizeof(int))); // 临时数组用于存储合并结果
     int left_index = 0, right_index = mid, temp_index = 0;
     while (left_index < mid && right_index < size)
     {
@@ -505,26 +514,100 @@ void sub_merge(int *array, int size)
     }
 
     g_free(temp); // 释放临时数组
+#endif
 }
 
-gboolean merge_sort(int *array, int *size)
+gboolean merge_sort(BarObject *array, int size)
 {
-    sub_merge(array, *size);
+    sub_merge(array, size);
     return TRUE; // 返回TRUE表示排序成功
 }
 
-gboolean heap_sort(int *array, int *size)
+gboolean heap_sort(BarObject *array, int size)
 {
+    return TRUE; // 返回TRUE表示排序成功
 }
 
-gboolean shell_sort(int *array, int *size)
+gboolean shell_sort(BarObject *array, int size)
 {
+    return TRUE; // 返回TRUE表示排序成功
 }
 
-gboolean counting_sort(int *array, int *size)
+gboolean counting_sort(BarObject *array, int size)
 {
+    return TRUE; // 返回TRUE表示排序成功
 }
 
-gboolean radix_sort(int *array, int *size)
+gboolean radix_sort(BarObject *array, int size)
 {
+    return TRUE; // 返回TRUE表示排序成功
+}
+
+
+// Function to update the surface with new content
+void my_sort_display_update_surface(gpointer user_data)
+{
+    MySortDisplay *self = MY_SORT_DISPLAY(user_data);
+
+    if (self && self->surface)
+    {
+        const int *data = my_sort_display_get_data(self);
+        int num_bars = sort_ctrl.getBarCount();
+        BarObject* barObj = sort_ctrl.getBarObjects();
+
+        cairo_t *surface_cr = cairo_create(self->surface);
+
+        cairo_set_source_rgb(surface_cr, 0.0, 0.0, 0.0); // Set background color to black
+        cairo_paint(surface_cr);
+#if 1
+        GtkAllocation allocation;
+        gtk_widget_get_allocation(GTK_WIDGET(self), &allocation);
+        int widget_width = allocation.width;
+        int widget_height = allocation.height;
+
+        sort_ctrl.initializeBars(widget_width, widget_height);
+
+        for (int i = 0; i < num_bars; i++)
+        {
+            float r = BarObject::colorData[(int)barObj[i].getBarColor()].r;
+            float g = BarObject::colorData[(int)barObj[i].getBarColor()].g;
+            float b = BarObject::colorData[(int)barObj[i].getBarColor()].b;
+            cairo_set_source_rgb(surface_cr, r,g,b);
+
+            cairo_rectangle(surface_cr, barObj[i].getBarX(), barObj[i].getBarY(), 
+                                        barObj[i].getBarWidth(), barObj[i].getBarHeight());
+            cairo_fill(surface_cr);
+        }
+#endif
+        cairo_destroy(surface_cr);
+        gtk_widget_queue_draw(GTK_WIDGET(self));
+    }
+}
+
+
+// Callback function for radio button toggles
+void on_sort_algorithm_changed(GtkToggleButton *button, gpointer user_data)
+{
+    if (gtk_toggle_button_get_active(button))
+    {
+        const gchar *label = gtk_button_get_label(GTK_BUTTON(button));
+        if (g_strcmp0(label, "Bubble Sort") == 0)
+            selected_algorithm = BUBBLE_SORT;
+        else if (g_strcmp0(label, "Selection Sort") == 0)
+            selected_algorithm = SELECTION_SORT;
+        else if (g_strcmp0(label, "Insertion Sort") == 0)
+            selected_algorithm = INSERTION_SORT;
+        else if (g_strcmp0(label, "Quick Sort") == 0)
+            selected_algorithm = QUICK_SORT;
+        else if (g_strcmp0(label, "Merge Sort") == 0)
+            selected_algorithm = MERGE_SORT;
+        else if (g_strcmp0(label, "Heap Sort") == 0)
+            selected_algorithm = HEAP_SORT;
+        else if (g_strcmp0(label, "Shell Sort") == 0)
+            selected_algorithm = SHELL_SORT;
+        else if (g_strcmp0(label, "Counting Sort") == 0)
+            selected_algorithm = COUNTING_SORT;
+        else if (g_strcmp0(label, "Radix Sort") == 0)
+            selected_algorithm = RADIX_SORT;
+    }
 }

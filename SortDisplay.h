@@ -3,6 +3,11 @@
 
 #include <gtk/gtk.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 G_BEGIN_DECLS
 
 #define MY_TYPE_SORT_DISPLAY my_sort_display_get_type()
@@ -15,7 +20,7 @@ struct _MySortDisplay
     cairo_surface_t *surface; // Surface to draw on
     int width;                // Width of the drawing area
     int height;               // Height of the drawing area
-    int* data;
+    void* data;
     int num_bars;
 };
 
@@ -37,7 +42,8 @@ void my_sort_display_set_data(MySortDisplay *self, int *data, int num_bars);
 // Declare the function prototype for shift_bar_chart_data
 void shift_bar_chart_data(int *data, int num_bars);
 
-// Function to update the surface with new content
-void my_sort_display_update_surface(gpointer user_data);
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //SORT_DISPLAY_H
